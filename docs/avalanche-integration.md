@@ -7,12 +7,13 @@ Live code paths:
 - `apps/web/lib/avalanche-live.ts` creates the Fuji client with `createAvalancheClient`.
 - `GET /api/avalanche/network` returns live Info, P-Chain, and C-Chain status.
 - `GET /api/monitor/chain/:chainId` reads live P-Chain validators through the monitor provider unless `AXON_FORCE_MOCK_AVALANCHE=true`.
+- `POST /api/agent/chat` attempts to source validator candidates from the live Fuji validator set before falling back.
 - `GET /api/deploy/readiness` reports broadcast readiness for Fuji preflight, Core Wallet, signer service, funding guard, and PlatformVM transaction builder.
 - `POST /api/deploy/l1` attaches a live Fuji network preflight to the deploy rehearsal receipt when Fuji is reachable.
 
 To enable real deployment:
 
-1. Add a backend signer service or wallet delegation flow.
+1. Replace the current injected wallet auth surface with the final Core Wallet connector package if deeper session management is required.
 2. Configure `AXON_SIGNER_SERVICE_URL`, `AXON_PLATFORM_TX_BUILDER_URL`, and `AXON_ENABLE_FUNDING_GUARD=true`.
 3. Replace `createMockDeployment` in `apps/web/lib/axon.ts` with calls to Avalanche PlatformVM APIs.
 4. Replace the in-memory mock history in `apps/web/lib/mock-store.ts` with Supabase `chains`.

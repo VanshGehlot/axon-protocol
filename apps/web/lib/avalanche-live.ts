@@ -1,6 +1,6 @@
 import { createAvalancheClient } from "@avalanche-sdk/client";
 import { avalancheFuji } from "@avalanche-sdk/client/chains";
-import type { AvalancheNetworkSnapshot, ChainHealth, ValidatorMetric } from "@/lib/types";
+import type { AvalancheNetworkSnapshot, ChainHealth, L1Validator, ValidatorMetric } from "@/lib/types";
 
 type AvalancheValidator = {
   nodeID: string;
@@ -104,6 +104,22 @@ export async function getAvalancheFujiValidator(nodeId: string): Promise<Validat
   }
 
   return toValidatorMetric(validator, 0);
+}
+
+export async function getAvalancheFujiValidatorCandidates(limit = 8): Promise<L1Validator[]> {
+  const client = getFujiClient();
+  const response = await client.pChain.getCurrentValidators({});
+
+  return response.validators
+    .map((validator: AvalancheValidator, index: number) => toValidatorMetric(validator, index))
+    .filter((validator) => validator.compliant)
+    .sort((left, right) => right.uptime - left.uptime)
+    .slice(0, limit)
+    .map((validator) => ({
+      nodeId: validator.nodeId,
+      weight: 100,
+      uptime: validator.uptime,
+    }));
 }
 
 function toValidatorMetric(validator: AvalancheValidator, index: number): ValidatorMetric {

@@ -15,7 +15,7 @@ import { writeLocalDeployment } from "@/components/DeploymentHistory";
 import type { AgentChatResponse, ChainHealth, DeploymentRecord, DeploymentResult, L1Config } from "@/lib/types";
 
 const demoPrompt = "I want a gaming L1 with 5 validators, AVAX as gas token, and 1000 TPS target";
-const demoWallet = "0xAxoN00000000000000000000000000000000Fuji";
+const demoWallet = "0x1111111111111111111111111111111111111111";
 
 export function DemoConsole() {
   const [config, setConfig] = useState<L1Config>();
@@ -81,8 +81,8 @@ export function DemoConsole() {
         <p className="axon-code text-[11px] uppercase tracking-[0.18em] text-accent">Judge walkthrough</p>
         <h1 className="mt-3 font-heading text-4xl font-semibold leading-tight">One click from idea to monitored L1</h1>
         <p className="mt-4 text-sm leading-7 text-muted">
-          This demo runs the core Axon story in sequence: natural-language config generation, mocked Fuji deployment,
-          and operator health review. It is designed to be shown live in under a minute.
+          This demo runs the core Axon story in sequence: natural-language config generation with live Fuji validator
+          candidates, deploy rehearsal with SDK preflight, and operator health review.
         </p>
         <button
           type="button"
@@ -103,8 +103,8 @@ export function DemoConsole() {
           />
           <Step
             icon={Rocket}
-            title="Deploy mock"
-            body="Create a deterministic Fuji receipt with chain ID, RPC URL, explorer URL, and tx hash."
+            title="Run rehearsal"
+            body="Create a gated Fuji receipt only after live network preflight returns."
             active={activeStep === "deploy"}
             complete={Boolean(deployment)}
           />
@@ -130,7 +130,7 @@ export function DemoConsole() {
             <div className="mt-4 space-y-3 text-sm leading-6 text-zinc-300">
               <p>Prompt: {demoPrompt}</p>
               <p>Wallet: {demoWallet}</p>
-              <p>RPC: {deployment?.rpcUrl ?? "Run the demo to create a mock Fuji RPC."}</p>
+              <p>RPC: {deployment?.rpcUrl ?? "Run the demo to create a Fuji rehearsal RPC."}</p>
               <p>
                 Monitor:{" "}
                 {health

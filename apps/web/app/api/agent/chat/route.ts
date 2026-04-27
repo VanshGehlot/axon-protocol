@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getAvalancheFujiValidatorCandidates } from "@/lib/avalanche-live";
 import { explainConfig, generateL1Config } from "@/lib/axon";
 import type { AgentChatRequest, AgentChatResponse } from "@/lib/types";
 
@@ -31,9 +32,18 @@ export async function POST(request: Request) {
     });
   }
 
-  const config = generateL1Config(message, body.walletAddress);
+  let validatorSource = "fallback Fuji validator list";
+  let validatorCandidates;
+  try {
+    validatorCandidates = await getAvalancheFujiValidatorCandidates(12);
+    validatorSource = "live Fuji P-Chain validator set";
+  } catch {
+    validatorCandidates = undefined;
+  }
+
+  const config = generateL1Config(message, body.walletAddress, validatorCandidates);
   return NextResponse.json<AgentChatResponse>({
-    reply: explainConfig(config),
+    reply: `${explainConfig(config)} Validator candidates came from the ${validatorSource}.`,
     action: "INFO",
     config,
   });

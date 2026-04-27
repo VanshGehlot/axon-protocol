@@ -1,4 +1,4 @@
-import type { ChainHealth, DeploymentResult, L1Config, ValidatorMetric } from "@/lib/types";
+import type { ChainHealth, DeploymentResult, L1Config, L1Validator, ValidatorMetric } from "@/lib/types";
 
 export const FUJI_CONFIG = {
   networkId: 5,
@@ -59,7 +59,11 @@ function titleCase(input: string) {
     .join(" ");
 }
 
-export function generateL1Config(message: string, walletAddress = "0x0000000000000000000000000000000000000000"): L1Config {
+export function generateL1Config(
+  message: string,
+  walletAddress = "0x0000000000000000000000000000000000000000",
+  validatorCandidates?: L1Validator[],
+): L1Config {
   const normalized = message.toLowerCase();
   const validatorMatch = normalized.match(/(\d+)\s*(validator|validators|nodes?)/);
   const tpsMatch = normalized.match(/(\d{2,6})\s*(tps|transactions per second)/);
@@ -76,7 +80,11 @@ export function generateL1Config(message: string, walletAddress = "0x00000000000
   const chainName = namedMatch?.[1]?.trim()
     ? titleCase(namedMatch[1].trim())
     : `${titleCase(purpose)} Axon L1`;
-  const validatorCount = Math.min(Math.max(Number(validatorMatch?.[1] ?? 3), 1), PUBLIC_FUJI_VALIDATORS.length);
+  const validatorPool: L1Validator[] =
+    validatorCandidates && validatorCandidates.length > 0
+      ? validatorCandidates
+      : PUBLIC_FUJI_VALIDATORS.map((nodeId) => ({ nodeId, weight: 100 }));
+  const validatorCount = Math.min(Math.max(Number(validatorMatch?.[1] ?? 3), 1), validatorPool.length);
   const tpsTarget = Math.min(Math.max(Number(tpsMatch?.[1] ?? 500), 50), 5000);
   const gasLimit = Math.max(15_000_000, Math.ceil(tpsTarget * 42_000));
   const permissions = normalized.includes("permissioned") || normalized.includes("private") ? "permissioned" : "public";
@@ -86,9 +94,10 @@ export function generateL1Config(message: string, walletAddress = "0x00000000000
   return {
     chainName,
     vmId: "SubnetEVM",
-    validators: PUBLIC_FUJI_VALIDATORS.slice(0, validatorCount).map((nodeId) => ({
-      nodeId,
-      weight: 100,
+    validators: validatorPool.slice(0, validatorCount).map((validator) => ({
+      nodeId: validator.nodeId,
+      weight: validator.weight,
+      uptime: validator.uptime,
     })),
     gasToken,
     customGasTokenSymbol: gasToken === "CUSTOM" ? "AXON" : undefined,

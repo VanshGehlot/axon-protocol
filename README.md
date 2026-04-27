@@ -12,6 +12,8 @@ Axon is an AI agent infrastructure layer built natively on Avalanche. Describe y
 - Fuji-ready API surface with an explicit broadcast readiness gate
 - Live Fuji network preflight through `@avalanche-sdk/client`
 - Live P-Chain validator reads through `platform.getCurrentValidators`
+- Config generation can source validator candidates from the live Fuji P-Chain set
+- Injected wallet connect plus signed Axon auth message for Core Wallet-compatible wallets
 - Multilingual-ready agent architecture
 - 60-second guided demo flow for reviewers
 - Local deploy rehearsal history for repeatable demos
@@ -39,9 +41,10 @@ http://localhost:3000/demo
 Click `Run full demo` to execute the complete product story:
 
 1. Generate a Fuji-ready Avalanche L1 config from natural language.
-2. Create a deterministic Fuji deploy rehearsal receipt after live SDK preflight.
-3. Load validator health through the monitor provider boundary.
-4. Save the rehearsal into local deployment history.
+2. Select validator candidates from live Fuji data when the SDK is reachable.
+3. Create a deterministic Fuji deploy rehearsal receipt after live SDK preflight.
+4. Load validator health through the monitor provider boundary.
+5. Save the rehearsal into local deployment history.
 
 ## Network
 
@@ -77,6 +80,8 @@ The deployment endpoint currently returns a deterministic Fuji rehearsal receipt
 The app intentionally separates:
 
 - Config generation: `apps/web/lib/axon.ts`
+- Live validator candidate loading: `apps/web/lib/avalanche-live.ts`
+- Wallet connect/signing surface: `apps/web/components/WalletConnect.tsx`
 - Broadcast readiness gate: `GET /api/deploy/readiness`
 - Deployment receipt generation: `POST /api/deploy/l1`
 - Mock deployment history: `GET /api/deploy/history`
