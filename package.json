@@ -1,0 +1,24 @@
+{
+  "name": "axon-protocol",
+  "private": true,
+  "version": "0.1.0",
+  "description": "AI-powered Avalanche L1 deployment and management agent.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck"
+  },
+  "packageManager": "npm@10.9.2",
+  "devDependencies": {
+    "turbo": "^2.5.8",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@avalanche-sdk/client": "^0.1.1"
+  }
+}
